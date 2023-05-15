@@ -1,0 +1,246 @@
+name: Code Scanning
+run-name: $${{ github.workflow }} by @$${{ github.actor }}
+
+on:
+  push:
+    branches: [${join(", ", protected_branches)}]
+  pull_request:
+    branches: [${join(", ", protected_branches)}]
+  schedule:
+    - cron: '30 10 * * 1'
+
+concurrency:
+  group: $${{ github.ref }}-$${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and Unit Test
+    runs-on: ubuntu-latest
+    if: (github.actor != 'dependabot[bot]')
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - run: echo "build..."
+
+  %{ if contains(code_scanners, "cfsec") }
+
+  cfsec:
+    name: SAST Scan using cfsec
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: cfsec
+        uses: aquasecurity/cfsec-sarif-action@master
+        with:
+          sarif_file: cfsec.sarif         
+          github_token: $${{ secrets.GITHUB_TOKEN }}
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: cfsec.sarif
+
+  %{ endif }%{ if contains(code_scanners, "checkov") }
+
+  checkov:
+    name: SAST Scan using Checkov
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Checkov GitHub Action
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          output_format: cli,sarif
+          output_file_path: console,results.sarif
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        if: success() || failure()
+        with:
+          sarif_file: results.sarif
+
+  %{ endif }%{ if contains(code_scanners, "codeql") }
+
+  codeql:
+      name: SAST Scan using CodeQL
+      runs-on: ubuntu-latest
+      needs: [build]      
+      permissions:
+        actions: read
+        contents: read
+        security-events: write
+      strategy:
+        fail-fast: false
+        matrix:
+          language: [ ${join(", ", codeql_languages)} ]
+        # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
+        # Use only 'java' to analyze code written in Java, Kotlin or both
+        # Use only 'javascript' to analyze code written in JavaScript, TypeScript or both
+        # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
+          
+      steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+           fetch-depth: 0
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: $${{ matrix.language }}
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:$${{matrix.language}}"
+
+  %{ endif }%{ if contains(code_scanners, "tflint") }
+
+  tflint:
+    name: SAST Scan using TFLint
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v3
+        name: Cache plugin dir
+        with:
+          path: ~/.tflint.d/plugins
+          key: tflint-$${{ hashFiles('.tflint.hcl') }}
+      - uses: terraform-linters/setup-tflint@v3
+        name: Setup TFLint
+        with:
+          tflint_version: v0.44.1
+      - name: Init TFLint
+        run: tflint --init
+        env:
+          GITHUB_TOKEN: $${{ github.token }}
+      - name: Run TFLint
+        run: tflint -f compact
+
+  %{ endif }%{ if contains(code_scanners, "phplint") }
+
+  phplint:
+    name: SAST Scan using PHPLint
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Check PHP syntax errors
+        uses: overtrue/phplint@6.0.0
+
+  %{ endif }%{ if contains(code_scanners, "psalm") }
+
+  psalm:
+    name: SAST Scan using Psalm
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Psalm
+        uses: docker://ghcr.io/psalm/psalm-github-actions
+        with:
+          security_analysis: true
+          report_file: results.sarif
+      - name: Upload Security Analysis results to GitHub
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: results.sarif
+
+  %{ endif }%{ if contains(code_scanners, "mobsfscan") }
+
+  mobsfscan:
+    name: SAST Scan using mobsfscan
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: MobSF/mobsfscan@main
+        with:
+          args: '. --sarif --output results.sarif || true'
+      - if: $${{ success() }} || $${{ failure() }}
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: results.sarif
+
+  %{ endif }%{ if contains(code_scanners, "semgrep") }
+
+  semgrep:
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    name: SAST Scan using Semgrep
+    runs-on: ubuntu-latest
+    needs: [build]
+    container:
+      image: returntocorp/semgrep
+    if: (github.actor != 'dependabot[bot]')
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - run: semgrep ci --sarif --output=semgrep.sarif
+        env:
+           # Add the rules that Semgrep uses by setting the SEMGREP_RULES environment variable. 
+           SEMGREP_RULES: p/default # more at semgrep.dev/explore
+      # Upload SARIF file generated in previous step
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: semgrep.sarif
+        if: always()
+
+  %{ endif }%{ if contains(code_scanners, "sonarqube") }
+
+  sonarqube:
+    name: SAST Scan using SonarQube
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: sonarsource/sonarqube-scan-action@master
+        with:
+          args: '-D sonar.projectKey=${repository}'
+        env:
+          SONAR_TOKEN: $${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: $${{ vars.SONAR_HOST_URL }}
+
+  %{ endif }%{ if contains(code_scanners, "megalinter") }
+
+  megalinter:
+    name: SAST Scan using Mega-Linter
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: oxsecurity/megalinter:v6
+        env:
+          VALIDATE_ALL_CODEBASE: $${{ github.event_name == 'push' }}
+          SARIF_REPORTER: true
+          DISABLE: COPYPASTE,SPELL
+          ENABLE_LINTERS: BASH_SHELLCHECK,SWIFT_SWIFTLINT,GROOVY_NPM_GROOVY_LINT,PHP_PSALM,PYTHON_BANDIT,JAVASCRIPT_ES,TYPESCRIPT_ES,JSX_ESLINT,TSX_ESLINT,JAVA_CHECKSTYLE,JAVA_PMD,KOTLIN_KTLINT,CLOUDFORMATION_CFN_LINT,DOCKERFILE_HADOLINT,REPOSITORY_CHECKOV,REPOSITORY_SEMGREP,REPOSITORY_SYFT,REPOSITORY_TRIVY,TERRAFORM_TFLINT,TERRAFORM_TERRASCAN,TERRAFORM_CHECKOV
+      - if: $${{ success() }} || $${{ failure() }}
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'megalinter-reports/megalinter-report.sarif'
+
+  %{ endif }
