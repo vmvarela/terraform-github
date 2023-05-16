@@ -10,6 +10,10 @@ terraform {
       source  = "jdamata/sonarqube"
       version = "0.15.13"
     }
+    gitlab = {
+      source  = "gitlabhq/gitlab"
+      version = "15.11.0"
+    }
   }
 }
 
@@ -21,3 +25,6 @@ provider "github" {
     # `GITHUB_APP_PEM_FILE`
   }
 }
+
+
+

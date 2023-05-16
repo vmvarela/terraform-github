@@ -70,6 +70,8 @@ variable "repositories" {
     security_scanners  = optional(set(string), [])
     teams_access       = optional(map(string), {})
     auto_codeowners    = optional(bool, false)
+    gitlab_mirror      = optional(string, "") # cloud, onprem or ""
+    gitlab_url         = optional(string, "") # path
   }))
   default = {}
 

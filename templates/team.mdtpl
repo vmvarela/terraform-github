@@ -9,7 +9,7 @@
 ## Repositorios
 | Repository Name | Description | Visibility| Topics | Tiene Issues | Home Page | Archived | Is Templage | Vulnerability Alerts | Default Branch |
 |-----------------|-------------|-----------|--------|--------------|-----------|----------|-------------|----------------------|----------------|
-%{ for k, v in repositories }| ${prefix}-${k} | ${v.description} | ${v.visibility} | ${join(", ", v.topics)} | ${v.has_issues} | ${v.homepage_url} | ${v.archived} | ${v.is_template} | ${v.dependabot} | %{ if v.default_branch == null }--%{ else }${v.default_branch}%{ endif } |
+%{ for k, v in repositories }| ${k} | ${v.description} | ${v.visibility} | ${join(", ", v.topics)} | ${v.has_issues} | ${v.homepage_url} | ${v.archived} | ${v.is_template} | ${v.dependabot} | %{ if v.default_branch == null }--%{ else }${v.default_branch}%{ endif } |
 %{ endfor }%{ endif }
 %{ if length(codeowners) > 0}
 ## Codeowners
