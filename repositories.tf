@@ -93,35 +93,38 @@ locals {
     replace(lower(var.prefix == "" ? k : format("%s-%s", var.prefix, k)), " ", "-") => i
   }
 
-  _repositories_topics = {
-    for k, i in local._repositories :
-    k => merge(i, {
-      "topics" = [for topic in(setunion(["terraformed"], i.topics, var.topics)) : replace(lower(topic), " ", "-")]
-    })
-  }
-
   _repositories_mirroring = {
-    for k, i in local._repositories_topics :
+    for k, i in local._repositories :
     k => merge(i, {
       "advanced_security"  = false
       "secret_scanning"    = false
       "dependabot"         = false
       "code_scanners"      = []
+      "topics"             = ["mirroring"]
       "archive_on_destroy" = false
     })
-    if contains(i.topics, "mirroring")
+    if i.gitlab_mirror != ""
   }
 
   _repositories_not_mirroring = {
-    for k, i in local._repositories_topics :
+    for k, i in local._repositories :
     k => merge(i, {
       "advanced_security"  = (i.visibility == "private" && (i.secret_scanning || i.dependabot || length(i.code_scanners) > 0))
       "archive_on_destroy" = true
     })
-    if !contains(i.topics, "mirroring")
+    if i.gitlab_mirror == ""
   }
 
-  repositories = merge(local._repositories_not_mirroring, local._repositories_mirroring)
+  _repositories_all = merge(local._repositories_not_mirroring, local._repositories_mirroring)
+
+  _repositories_topics = {
+    for k, i in local._repositories_all :
+    k => merge(i, {
+      "topics" = [for topic in(setunion(["terraformed"], i.topics, var.topics)) : replace(lower(topic), " ", "-")]
+    })
+  }
+
+  repositories = local._repositories_topics
 
   default_branch = { for k, v in local.repositories : k => v.default_branch if v.default_branch != "" }
 
