@@ -34,8 +34,8 @@ resource "github_team_membership" "codeowners" {
 resource "github_team_repository" "push" {
   for_each   = local.repository_access
   team_id    = github_team.developers.id
-  repository = each.value
-  permission = "push"
+  repository = each.value.name
+  permission = each.value.repo.gitlab_mirror != "" ? "pull" : "push"
   depends_on = [
     github_repository.repo
   ]
@@ -45,8 +45,8 @@ resource "github_team_repository" "push" {
 resource "github_team_repository" "maintain" {
   for_each   = local.repository_access
   team_id    = github_team.codeowners.id
-  repository = each.value
-  permission = "maintain"
+  repository = each.value.name
+  permission = each.value.repo.gitlab_mirror != "" ? "pull" : "maintain"
   depends_on = [
     github_repository.repo
   ]
@@ -81,6 +81,9 @@ locals {
   ]
   developers_memberships = { for i in concat(local._members, local._maintainers) : format("%s_%s", i.team, i.username) => i }
 
-  repository_access = { for k, i in local.repositories : format("%s_%s", var.name, k) => k }
+  repository_access = { for k, i in local.repositories : format("%s_%s", var.name, k) => {
+      name = k
+      repo = i
+  } }
 
 }

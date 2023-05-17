@@ -146,7 +146,7 @@ locals {
       for t, a in v.teams_access : {
         repository = k
         team       = t
-        permission = (a == "write" ? "push" : "pull")
+        permission = (v.gitlab_mirror != "" ? "pull" : (a == "write" ? "push" : "pull"))
       }
     ]
   ])
