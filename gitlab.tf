@@ -83,6 +83,6 @@ data "gitlab_project_protected_branches" "gitlab_onprem" {
 }
 
 locals {
-    gitlab_cloud_mirrors = { for k, i in local.repositories : k => i.gitlab_url if i.gitlab_mirror == "cloud" }
-    gitlab_onprem_mirrors = { for k, i in local.repositories : k => i.gitlab_url if i.gitlab_mirror == "onprem" }
+  gitlab_cloud_mirrors  = { for k, i in local.repositories : k => i.gitlab_url if i.gitlab_mirror == "cloud" }
+  gitlab_onprem_mirrors = { for k, i in local.repositories : k => i.gitlab_url if i.gitlab_mirror == "onprem" }
 }

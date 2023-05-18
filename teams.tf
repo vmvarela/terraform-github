@@ -82,8 +82,8 @@ locals {
   developers_memberships = { for i in concat(local._members, local._maintainers) : format("%s_%s", i.team, i.username) => i }
 
   repository_access = { for k, i in local.repositories : format("%s_%s", var.name, k) => {
-      name = k
-      repo = i
+    name = k
+    repo = i
   } }
 
 }
