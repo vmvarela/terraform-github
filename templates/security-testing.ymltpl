@@ -25,4 +25,21 @@ jobs:
         with:
           sarif_file: results.sarif
 
+  %{ endif }%{ if contains(security_scanners, "zaproxy-api") }
+
+  zaproxy-api:
+    name: ZAP API Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: zaproxy/action-api-scan@v0.1.1
+        with:
+          target: ${url}
+          allow_issue_writing: false
+      - name: Create sarif file from zaproxy results
+        uses: SvanBoxel/zaproxy-to-ghas@main
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: results.sarif
+
   %{ endif }
