@@ -1,15 +1,16 @@
 # developers team
+
 resource "github_team" "developers" {
-  name           = var.name
+  name           = local.developers_name
   description    = (var.description == "" ? upper(var.name) : var.description)
   privacy        = var.privacy
-  parent_team_id = var.parent_team_id
+  parent_team_id = local.parent_name
 }
 
 # codeowners team
 resource "github_team" "codeowners" {
-  name           = join("-", ["codeowner", var.name])
-  description    = join(" ", [(var.description == "" ? upper(var.name) : var.description), "(CODEOWNER)"])
+  name           = local.codeowners_name
+  description    = join(" ", [(var.description == "" ? upper(var.name) : var.description), "(CODEOWNERS)"])
   privacy        = var.privacy
   parent_team_id = github_team.developers.id
 }
@@ -52,12 +53,18 @@ resource "github_team_repository" "maintain" {
   ]
 }
 
+
 locals {
+
+  developers_name = replace(lower(var.name), "/[ //]/", "-")
+  codeowners_name = join("-", [local.developers_name, "codeowners"])
+  _parent_name    = replace(lower(dirname(var.name)), "/[ //]/", "-")
+  parent_name     = (local._parent_name == "." ? null : local._parent_name)
 
   # build codeowners team memberships
   _codeowners = [
     for i in var.codeowners : {
-      team     = var.name
+      team     = local.codeowners_name
       role     = "member"
       username = i
     }
@@ -67,21 +74,21 @@ locals {
   # build developers team memberships
   _members = [
     for i in var.developers : {
-      team     = var.name
+      team     = local.developers_name
       role     = "member"
       username = i
     }
   ]
   _maintainers = [
     for i in var.codeowners : {
-      team     = var.name
+      team     = local.developers_name
       role     = "maintainer"
       username = i
     }
   ]
   developers_memberships = { for i in concat(local._members, local._maintainers) : format("%s_%s", i.team, i.username) => i }
 
-  repository_access = { for k, i in local.repositories : format("%s_%s", var.name, k) => {
+  repository_access = { for k, i in local.repositories : format("%s_%s", local.developers_name, k) => {
     name = k
     repo = i
   } }
