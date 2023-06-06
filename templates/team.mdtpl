@@ -6,20 +6,20 @@
 
 # Team ${team}
 %{ if length(repositories) > 0}
-## Repositorios
-| Repository Name | Description | Visibility| Topics | Tiene Issues | Home Page | Archived | Is Templage | Vulnerability Alerts | Default Branch |
-|-----------------|-------------|-----------|--------|--------------|-----------|----------|-------------|----------------------|----------------|
-%{ for k, v in repositories }| ${k} | ${v.description} | ${v.visibility} | ${join(", ", v.topics)} | ${v.has_issues} | ${v.homepage_url} | ${v.archived} | ${v.is_template} | ${v.dependabot} | %{ if v.default_branch == null }--%{ else }${v.default_branch}%{ endif } |
+## [Repositorios](https://github.com/orgs/${github_owner}/teams/${team}/repositories)
+| Repository Link | Description |
+|-----------------|-------------|
+%{ for k, v in repositories }| [${k}](https://github.com/${github_owner}/${k}) | ${v.description} |
 %{ endfor }%{ endif }
 %{ if length(codeowners) > 0}
-## Codeowners
-| CodeOwner |
-|-----------|
-%{ for k, v in codeowners }| ${k} |
+## [Codeowners](https://github.com/orgs/${github_owner}/teams/codeowner-${team})
+| CodeOwners |
+|------------|
+%{ for k, v in codeowners }| [${k}](https://github.com/orgs/${github_owner}/people/${k}) |
 %{ endfor }%{ endif }
 %{ if length(developers) > 0}
-## Developers
+## [Developers](https://github.com/orgs/${github_owner}/teams/${team})
 | Developers |
 |------------|
-%{ for k, v in developers }| ${k} |
+%{ for k, v in developers }| [${k}](https://github.com/orgs/${github_owner}/people/${k}) |
 %{ endfor }%{ endif }
