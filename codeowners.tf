@@ -3,6 +3,6 @@ resource "github_repository_file" "codeowners" {
   repository          = each.key
   branch              = each.value.default_branch
   file                = ".github/CODEOWNERS"
-  content             = format("* @%s/%s", var.github_owner, join("-", ["codeowner", var.name]))
+  content             = format("* @%s/%s", var.github_owner, local.codeowners_name)
   overwrite_on_create = true
 }

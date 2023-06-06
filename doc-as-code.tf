@@ -6,7 +6,7 @@ resource "github_repository_file" "team_md" {
   overwrite_on_create = true
   content = templatefile("${path.module}/templates/team.mdtpl", {
     github_owner = var.github_owner
-    team         = var.name,
+    team         = local.developers_name,
     repositories = local.repositories,
     codeowners   = var.codeowners,
     developers   = var.developers,

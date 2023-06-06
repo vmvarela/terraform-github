@@ -8,7 +8,7 @@ terraform {
     }
     sonarqube = {
       source  = "jdamata/sonarqube"
-      version = "0.15.13"
+      version = "0.16.1"
     }
     gitlab = {
       source  = "gitlabhq/gitlab"

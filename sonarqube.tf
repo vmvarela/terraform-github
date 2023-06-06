@@ -40,14 +40,14 @@ resource "sonarqube_project_main_branch" "repo" {
 # developers team
 resource "sonarqube_group" "developers" {
   count       = length(local.sonar_projects) > 0 ? 1 : 0
-  name        = format("%s/%s", var.github_owner, var.name)
+  name        = format("%s/%s", var.github_owner, local.developers_name)
   description = (var.description == "" ? upper(var.name) : var.description)
 }
 
 # codeowners team
 resource "sonarqube_group" "codeowners" {
   count       = length(local.sonar_projects) > 0 ? 1 : 0
-  name        = format("%s/%s", var.github_owner, join("-", ["codeowner", var.name]))
+  name        = format("%s/%s", var.github_owner, local.codeowners_name)
   description = join(" ", [(var.description == "" ? upper(var.name) : var.description), "(CODEOWNER)"])
 }
 
@@ -55,7 +55,7 @@ resource "sonarqube_group" "codeowners" {
 resource "sonarqube_permissions" "codeviewer" {
   for_each    = { for k, i in local.sonar_projects : format("%s_%s", var.name, k) => k }
   project_key = each.value
-  group_name  = format("%s/%s", var.github_owner, github_team.developers.name)
+  group_name  = format("%s/%s", var.github_owner, local.developers_name)
   permissions = ["codeviewer", "scan", "user"]
   depends_on  = [sonarqube_project.repo]
 }
@@ -64,7 +64,7 @@ resource "sonarqube_permissions" "codeviewer" {
 resource "sonarqube_permissions" "admin" {
   for_each    = { for k, i in local.sonar_projects : format("%s_%s", var.name, k) => k }
   project_key = each.value
-  group_name  = format("%s/%s", var.github_owner, github_team.codeowners.name)
+  group_name  = format("%s/%s", var.github_owner, local.codeowners_name)
   permissions = ["admin"]
   depends_on  = [sonarqube_project.repo]
 }
