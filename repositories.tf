@@ -110,7 +110,7 @@ locals {
     for k, i in local._repositories :
     k => merge(i, {
       "advanced_security"  = (i.visibility == "private" && (i.secret_scanning || i.dependabot || length(i.code_scanners) > 0))
-      "archive_on_destroy" = true
+      "archive_on_destroy" = i.archive_on_destroy
     })
     if i.gitlab_mirror == ""
   }
