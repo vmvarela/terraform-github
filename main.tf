@@ -4,27 +4,51 @@ terraform {
   required_providers {
     github = {
       source  = "integrations/github"
-      version = "5.25.0"
+      version = ">= 5.28.0"
     }
     sonarqube = {
-      source  = "jdamata/sonarqube"
-      version = "0.16.1"
+      source = "jdamata/sonarqube"
     }
     gitlab = {
-      source  = "gitlabhq/gitlab"
-      version = "15.11.0"
+      source = "gitlabhq/gitlab"
+      configuration_aliases = [
+        gitlab.cloud,
+        gitlab.onprem,
+      ]
     }
   }
 }
 
-provider "github" {
-  app_auth {
-    # `GITHUB_OWNER`
-    # `GITHUB_APP_ID`
-    # `GITHUB_APP_INSTALLATION_ID` (https://github.com/organizations/PrisaMedia/settings/installations/??????)
-    # `GITHUB_APP_PEM_FILE`
+module "docs" {
+  source         = "./modules/confluence"
+  doc_repository = "devops-docs"
+  github_owner   = var.github_owner
+  name           = var.name
+  team           = local.developers_name
+  repositories   = local.repositories
+  codeowners     = var.codeowners
+  developers     = var.developers
+}
+
+module "gitlab" {
+  source             = "./modules/gitlab"
+  github_owner       = var.github_owner
+  github_mirror_auth = var.github_mirror_auth
+  repositories       = local.repositories
+
+  providers = {
+    gitlab.onprem = gitlab.onprem
+    gitlab.cloud  = gitlab.cloud
   }
 }
 
-
+module "sonarqube" {
+  source          = "./modules/sonarqube"
+  repositories    = local.repositories
+  name            = var.name
+  description     = var.description
+  github_owner    = var.github_owner
+  developers_name = local.developers_name
+  codeowners_name = local.codeowners_name
+}
 

@@ -4,7 +4,7 @@ prefix      = "test"
 topics      = ["terratest"]
 
 codeowners = [
-  "vmvarela-clb_prisa",  # Victor M. Varela
+  "vmvarela-clb_prisa", # Victor M. Varela
 ]
 
 developers = [
@@ -16,7 +16,9 @@ repositories = {
     description        = "repotest"
     topics             = ["test"]
     archive_on_destroy = false
-    
+
   }
 
 }
+
+sonarqube_host_url = "https://sonarqube-qa.prisamedia.com"

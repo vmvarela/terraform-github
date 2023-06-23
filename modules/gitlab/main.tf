@@ -1,39 +1,16 @@
-provider "gitlab" {
-  alias    = "cloud"
-  base_url = "https://gitlab.com"
-  token    = var.gitlab_cloud_token
+terraform {
+  required_providers {
+    gitlab = {
+      source  = "gitlabhq/gitlab"
+      version = ">= 15.11.0"
+      configuration_aliases = [
+        gitlab.cloud,
+        gitlab.onprem,
+      ]
+    }
+  }
 }
 
-provider "gitlab" {
-  alias    = "onprem"
-  base_url = var.gitlab_onprem_url
-  token    = var.gitlab_onprem_token
-}
-
-variable "gitlab_cloud_token" {
-  type        = string
-  description = "gitlab.com token"
-  default     = ""
-}
-
-variable "gitlab_onprem_url" {
-  type        = string
-  description = "gitlab (on-prem) base url"
-  default     = ""
-}
-
-variable "gitlab_onprem_token" {
-  type        = string
-  description = "gitlab (on-prem) token"
-  default     = ""
-}
-
-# username:token to push into github from gitlab
-variable "github_mirror_auth" {
-  type        = string
-  description = "github.com username:token"
-  default     = ""
-}
 
 # gitlab.com mirror
 resource "gitlab_project_mirror" "gitlab" {
@@ -69,7 +46,6 @@ resource "gitlab_project_mirror" "gitlab_onprem" {
   enabled                 = true
 }
 
-
 data "gitlab_project" "gitlab_onprem" {
   provider            = gitlab.onprem
   for_each            = local.gitlab_onprem_mirrors
@@ -83,6 +59,6 @@ data "gitlab_project_protected_branches" "gitlab_onprem" {
 }
 
 locals {
-  gitlab_cloud_mirrors  = { for k, i in local.repositories : k => i.gitlab_url if i.gitlab_mirror == "cloud" }
-  gitlab_onprem_mirrors = { for k, i in local.repositories : k => i.gitlab_url if i.gitlab_mirror == "onprem" }
+  gitlab_cloud_mirrors  = { for k, i in var.repositories : k => i.gitlab_url if i.gitlab_mirror == "cloud" }
+  gitlab_onprem_mirrors = { for k, i in var.repositories : k => i.gitlab_url if i.gitlab_mirror == "onprem" }
 }

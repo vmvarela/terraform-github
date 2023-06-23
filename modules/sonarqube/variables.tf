@@ -3,46 +3,25 @@ variable "github_owner" {
   default = ""
 }
 
-# username:token to push into github from gitlab
-variable "github_mirror_auth" {
-  type        = string
-  description = "github.com username:token"
-  default     = ""
-}
-
-
 variable "name" {
   type = string
 }
 
-variable "prefix" {
-  type    = string
-  default = ""
-}
-
-variable "topics" {
-  type    = set(string)
-  default = []
-}
-
 variable "description" {
+  type = string
+}
+
+variable "sonarqube_user" {
   type    = string
-  default = ""
+  default = "admin"
 }
 
-variable "codeowners" {
-  type    = set(string)
-  default = []
+variable "developers_name" {
+  type = string
 }
 
-variable "developers" {
-  type    = set(string)
-  default = []
-}
-
-variable "privacy" {
-  type    = string
-  default = "closed"
+variable "codeowners_name" {
+  type = string
 }
 
 variable "repositories" {
@@ -72,15 +51,4 @@ variable "repositories" {
   }))
   default = {}
 
-}
-
-
-variable "sonarqube_token" {
-  type    = string
-  default = ""
-}
-
-variable "sonarqube_host_url" {
-  type    = string
-  default = ""
 }
