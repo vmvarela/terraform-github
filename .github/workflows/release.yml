@@ -28,7 +28,7 @@ jobs:
 
       - name: Run ReleaseMe
         id: release
-        uses: ./
+        uses: dev-build-deploy/release-me@v0
         with:
           token: ${{ github.token }}
           prefix: v
