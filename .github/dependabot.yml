@@ -4,12 +4,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    reviewers:
-      - "PrisaMedia/devops-codeowners"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-    reviewers:
-      - "PrisaMedia/devops-codeowners"
