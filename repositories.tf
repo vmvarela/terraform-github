@@ -86,6 +86,35 @@ resource "github_team_repository" "repo" {
   depends_on = [github_repository.repo]
 }
 
+resource "tls_private_key" "deploy_key" {
+  for_each  = local.deploy_keys_access
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "null_resource" "create_subfolder" {
+  provisioner "local-exec" {
+    command = "mkdir -p deploy_keys"
+  }
+}
+
+resource "local_file" "private_key_file" {
+  for_each = local.deploy_keys_access
+  filename = "deploy_keys/${each.key}.pem"
+  content  = tls_private_key.deploy_key[each.key].private_key_openssh
+  depends_on = [
+    null_resource.create_subfolder
+  ]
+}
+
+resource "github_repository_deploy_key" "repo" {
+  for_each   = local.deploy_keys_access
+  title      = each.value.title
+  repository = each.value.repository
+  key        = tls_private_key.deploy_key[each.key].public_key_openssh
+  read_only  = each.value.read_only
+}
+
 locals {
 
   _repositories = {
@@ -152,5 +181,17 @@ locals {
   ])
 
   teams_access = { for i in local._teams_access : format("%s_%s", i.repository, i.team) => i }
+
+  _deploy_keys_access = flatten([
+    for k, v in local.repositories : [
+      for n, a in v.deploy_keys : {
+        repository = k
+        title      = n
+        read_only  = (a == "write" ? "false" : "true")
+      }
+    ]
+  ])
+
+  deploy_keys_access = { for i in local._deploy_keys_access : format("%s_%s", i.repository, i.title) => i }
 
 }

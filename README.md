@@ -98,7 +98,10 @@ No modules.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_github"></a> [github](#provider\_github) | 5.28.0 |
+| <a name="provider_github"></a> [github](#provider\_github) | 5.29.0 |
+| <a name="provider_local"></a> [local](#provider\_local) | 2.4.0 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.2.1 |
+| <a name="provider_tls"></a> [tls](#provider\_tls) | 4.0.4 |
 
 ## Modules
 
@@ -116,6 +119,7 @@ No modules.
 | [github_branch_default.repo](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/branch_default) | resource |
 | [github_branch_protection.repo](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/branch_protection) | resource |
 | [github_repository.repo](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository) | resource |
+| [github_repository_deploy_key.repo](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_deploy_key) | resource |
 | [github_repository_file.code_scanning](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_file) | resource |
 | [github_repository_file.codeowners](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_file) | resource |
 | [github_repository_file.security_testing](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_file) | resource |
@@ -126,6 +130,9 @@ No modules.
 | [github_team_repository.maintain](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/team_repository) | resource |
 | [github_team_repository.push](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/team_repository) | resource |
 | [github_team_repository.repo](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/team_repository) | resource |
+| [local_file.private_key_file](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
+| [null_resource.create_subfolder](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [tls_private_key.deploy_key](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) | resource |
 
 ## Inputs
 
@@ -139,7 +146,7 @@ No modules.
 | <a name="input_name"></a> [name](#input\_name) | n/a | `string` | n/a | yes |
 | <a name="input_prefix"></a> [prefix](#input\_prefix) | n/a | `string` | `""` | no |
 | <a name="input_privacy"></a> [privacy](#input\_privacy) | n/a | `string` | `"closed"` | no |
-| <a name="input_repositories"></a> [repositories](#input\_repositories) | n/a | <pre>map(object({<br>    description        = optional(string, "")<br>    default_branch     = optional(string, "")<br>    protected_branches = optional(set(string), [])<br>    visibility         = optional(string, "private")<br>    topics             = optional(set(string), [])<br>    homepage_url       = optional(string, "")<br>    has_issues         = optional(bool, false)<br>    is_template        = optional(bool, false)<br>    template           = optional(string, null)<br>    archived           = optional(bool, false)<br>    archive_on_destroy = optional(bool, true)<br>    advanced_security  = optional(bool, true)<br>    dependabot         = optional(bool, true)<br>    secret_scanning    = optional(bool, true)<br>    code_scanners      = optional(set(string), [])<br>    codeql_languages   = optional(set(string), ["java"])<br>    reusable_workflows = optional(bool, false)<br>    security_scanners  = optional(set(string), [])<br>    teams_access       = optional(map(string), {})<br>    auto_codeowners    = optional(bool, false)<br>    gitlab_mirror      = optional(string, "") # cloud, onprem or ""<br>    gitlab_url         = optional(string, "") # path<br>  }))</pre> | `{}` | no |
+| <a name="input_repositories"></a> [repositories](#input\_repositories) | n/a | <pre>map(object({<br>    description        = optional(string, "")<br>    default_branch     = optional(string, "")<br>    protected_branches = optional(set(string), [])<br>    visibility         = optional(string, "private")<br>    topics             = optional(set(string), [])<br>    homepage_url       = optional(string, "")<br>    has_issues         = optional(bool, false)<br>    is_template        = optional(bool, false)<br>    template           = optional(string, null)<br>    archived           = optional(bool, false)<br>    archive_on_destroy = optional(bool, true)<br>    advanced_security  = optional(bool, true)<br>    dependabot         = optional(bool, true)<br>    secret_scanning    = optional(bool, true)<br>    code_scanners      = optional(set(string), [])<br>    codeql_languages   = optional(set(string), ["java"])<br>    reusable_workflows = optional(bool, false)<br>    security_scanners  = optional(set(string), [])<br>    teams_access       = optional(map(string), {})<br>    deploy_keys        = optional(map(string), {})<br>    auto_codeowners    = optional(bool, false)<br>    gitlab_mirror      = optional(string, "") # cloud, onprem or ""<br>    gitlab_url         = optional(string, "") # path<br>  }))</pre> | `{}` | no |
 | <a name="input_sonarqube_host_url"></a> [sonarqube\_host\_url](#input\_sonarqube\_host\_url) | n/a | `string` | `""` | no |
 | <a name="input_sonarqube_token"></a> [sonarqube\_token](#input\_sonarqube\_token) | n/a | `string` | `""` | no |
 | <a name="input_topics"></a> [topics](#input\_topics) | n/a | `set(string)` | `[]` | no |
