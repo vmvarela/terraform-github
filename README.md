@@ -98,7 +98,7 @@ No modules.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_github"></a> [github](#provider\_github) | 5.29.0 |
+| <a name="provider_github"></a> [github](#provider\_github) | 5.31.0 |
 | <a name="provider_local"></a> [local](#provider\_local) | 2.4.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | 3.2.1 |
 | <a name="provider_tls"></a> [tls](#provider\_tls) | 4.0.4 |
@@ -123,10 +123,13 @@ No modules.
 | [github_repository_file.code_scanning](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_file) | resource |
 | [github_repository_file.codeowners](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_file) | resource |
 | [github_repository_file.security_testing](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_file) | resource |
+| [github_team.admins](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/team) | resource |
 | [github_team.codeowners](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/team) | resource |
 | [github_team.developers](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/team) | resource |
+| [github_team_membership.admins](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/team_membership) | resource |
 | [github_team_membership.codeowners](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/team_membership) | resource |
 | [github_team_membership.developers](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/team_membership) | resource |
+| [github_team_repository.admin](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/team_repository) | resource |
 | [github_team_repository.maintain](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/team_repository) | resource |
 | [github_team_repository.push](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/team_repository) | resource |
 | [github_team_repository.repo](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/team_repository) | resource |
@@ -138,6 +141,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_admins"></a> [admins](#input\_admins) | n/a | `set(string)` | `[]` | no |
 | <a name="input_codeowners"></a> [codeowners](#input\_codeowners) | n/a | `set(string)` | `[]` | no |
 | <a name="input_description"></a> [description](#input\_description) | n/a | `string` | `""` | no |
 | <a name="input_developers"></a> [developers](#input\_developers) | n/a | `set(string)` | `[]` | no |

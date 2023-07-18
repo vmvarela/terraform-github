@@ -40,6 +40,12 @@ variable "developers" {
   default = []
 }
 
+variable "admins" {
+  type    = set(string)
+  default = []
+}
+
+
 variable "privacy" {
   type    = string
   default = "closed"
