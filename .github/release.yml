@@ -7,11 +7,11 @@ changelog:
     scopes: ["deps"]
   categories:
     - title: "💥 Breaking Changes"
-      increment: ["major"]
+      increment: ["feat!"]
     - title: "✨ New Features"
-      increment: ["minor"]
+      increment: ["feat"]
     - title: "🐛 Bug Fixes"
-      increment: ["patch"]
+      increment: ["fix"]
       exclude:
         scopes: ["internal"]
     - title: "📚 Documentation"
